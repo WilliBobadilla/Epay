@@ -119,8 +119,8 @@
         actualMarker.setLatLng([position.coords.latitude, position.coords.longitude]).update();
         console.log("whatching for the position:" + [position.coords.latitude, position.coords.longitude])
 
-        document.getElementById("Latitude").innerHTML ="Actual: "+ position.lat 
-        document.getElementById("Longitude").innerHTML ="Actual: " +position.lng
+        document.getElementById("Latitude").innerHTML ="Actual: "+position.coords.latitude
+        document.getElementById("Longitude").innerHTML ="Actual: " +position.coords.longitude
     });
 
 </script>
