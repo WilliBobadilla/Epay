@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+    <style>
+        html,
+        body,
+        #mapid {
+            height: 90%;
+            width: 100%;
+            margin: 0px;
+            padding: 0px
+        }
+    </style>
+</head>
+
+<body>
+    <h1>My First Map</h1>
+    <label>Ingresar a cuantos metros tiene que sonar el aviso:</label><br>
+    <input type="number" id="distancia" value="500" />
+    <audio id="audio">
+        <source src="/audios/alarma.mp3" type="audio/ogg">
+      Your browser does not support the audio element.
+      </audio> 
+    <h3 id="Latitude"></h3>
+    <h3 id="Longitude"></h3>
+    <div id="mapid"></div>
+</body>
+<script>
+
+    curLocation = [-26.67, -55.67]
+    var map = L.map('mapid').setView(curLocation, 13);
+    var marker2 = new L.marker(curLocation, {
+        draggable: 'true'
+    });
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            latit = position.coords.latitude;
+            longit = position.coords.longitude;
+            actual = [latit, longit];
+            // this is just a marker placed in that position
+            var abc = L.marker(actual).addTo(map);
+            // move the map to have the location in its center
+            map.panTo(new L.LatLng(latit, longit));
+            actualizar_pos(actual)
+        })
+    } else {
+        alert("No es soportado la localizacion")
+        actualizar_pos([-26.85992, -58.30883])
+
+    }
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    map.attributionControl.setPrefix(false);
+    function actualizar_pos(coordenadas) {
+        marker2.setLatLng(coordenadas);
+        map.addLayer(marker2);
+        var position = marker2.getLatLng();
+        marker2.setLatLng(position, {
+            draggable: 'true'
+        }).bindPopup(position).update();
+        document.getElementById("Latitude").innerHTML = position.lat
+        document.getElementById("Longitude").innerHTML = position.lng
+    }
+    marker2.on('dragend', function (event) {
+        var position = marker2.getLatLng();
+        marker2.setLatLng(position, {
+            draggable: 'true'
+        }).bindPopup(position).update();
+        document.getElementById("Latitude").innerHTML = position.lat
+        document.getElementById("Longitude").innerHTML = position.lng
+    });
+
+
+/**/
+let inputDistancia= document.getElementById("distancia")
+let alarma= document.getElementById("audio")
+inputDistancia.addEventListener("change",function(e){   
+    console.log(alarma.paused)
+    if (alarma.paused){
+        alarma.play()
+    }else{
+        alarma.pause()
+    }
+
+})
+</script>
+
+</html>
