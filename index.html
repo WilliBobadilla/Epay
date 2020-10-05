@@ -8,132 +8,155 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
         integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
         crossorigin=""></script>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="" />
-        <meta name="author" content="" />
-        <title>Epay</title>
-        <!-- Favicon-->
-        <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico" />
-        <!-- Font Awesome icons (free version)-->
-        <script src="https://use.fontawesome.com/releases/v5.13.0/js/all.js" crossorigin="anonymous"></script>
-        <!-- Google fonts-->
-        <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css" />
-        <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
-        <!-- Core theme CSS (includes Bootstrap)-->
-        <link href="css/styles.css" rel="stylesheet" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Epay</title>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico" />
+    <!-- Font Awesome icons (free version)-->
+    <script src="https://use.fontawesome.com/releases/v5.13.0/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet"
+        type="text/css" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="css/styles.css" rel="stylesheet" />
     <style>
-        html,
-        body,
+      
         #mapid {
             height: 90%;
             width: 100%;
             margin: 0px;
-            padding: 0px
+            padding: 0px;
+            position: absolute;
         }
     </style>
 </head>
 
 <body>
-    <h1>My First Map</h1>
-    <label>Ingresar a cuantos metros tiene que sonar el aviso:</label><br>
-    <input type="number" id="distancia" value="500" />
-    <audio id="audio">
-        <source src="/audios/alarma.mp3" type="audio/ogg">
-        Your browser does not support the audio element.
-    </audio>
-    <h2 id="distanciaPuntos">Distancia: 0 Km</h2>
-    <h3 id="Latitude"></h3>
-    <h3 id="Longitude"></h3>
-    <div id="mapid"></div>
-</body>
-<script>
 
-    curLocation = [-26.67, -55.67]
-    let distancia;
-    var actualMarker;
-    var map = L.map('mapid').fitWorld();
-    map.locate({setView:true, maxZoom:15})
-    var marker2 = new L.marker(curLocation, {
-        draggable: 'true'
-    });
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function (position) {
-            latit = position.coords.latitude;
-            longit = position.coords.longitude;
-            radius= position.coords.accuracy
-            actual = [latit, longit];
-            // this is just a marker placed in that position
-            actualMarker = L.marker(actual).addTo(map).bindPopup( parseFloat(radius).toFixed(2) +"metros de precision" ).openPopup();;
-            L.circle(actual, radius).addTo(map);
-            // move the map to have the location in its center
-            map.panTo(new L.LatLng(latit, longit));
-            actualizar_pos(actual)
-        })
-    } else {
-        alert("No es soportado la localizacion")
-        actualizar_pos([-26.85992, -58.30883])
+    <body id="page-top">
+        <!-- Navigation-->
+        <nav class="navbar navbar-expand-lg bg-secondary text-uppercase fixed-top" id="mainNav">
+            <div class="container">
+                <a class="navbar-brand js-scroll-trigger" href="#page-top">Epay</a>
+                <button
+                    class="navbar-toggler navbar-toggler-right text-uppercase font-weight-bold bg-primary text-white rounded"
+                    type="button" data-toggle="collapse" data-target="#navbarResponsive"
+                    aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                    Menu
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item mx-0 mx-lg-1"><a
+                                class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger"
+                                href="#portfolio">Acerca de</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <header class="masthead bg-primary text-white text-center">
+            <div class="container d-flex align-items-center flex-column">
+                <label>Ingresar a cuantos metros tiene que sonar el aviso:</label><br>
+                <input type="number" id="distancia" value="500" />
+                <audio id="audio">
+                    <source src="/audios/alarma.mp3" type="audio/ogg">
+                    Your browser does not support the audio element.
+                </audio>
+                <h4 id="distanciaPuntos">Distancia: 0 Km</h4>
+            </div>
+            <div id="mapid"></div>
+        </header>
 
-    }
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-    map.attributionControl.setPrefix(false);
+    </body>
+    <script>
 
-    function actualizar_pos(coordenadas) {
-        marker2.setLatLng(coordenadas);
-        map.addLayer(marker2);
-        var position = marker2.getLatLng();
-        marker2.setLatLng(position, {
+        curLocation = [-26.67, -55.67]
+        let distancia;
+        var actualMarker;
+        var map = L.map('mapid').fitWorld();
+        map.locate({ setView: true, maxZoom: 15 })
+        var marker2 = new L.marker(curLocation, {
             draggable: 'true'
-        }).bindPopup(position).update();
-    }
-    marker2.on('dragend', function (event) {
-        var position = marker2.getLatLng();
-        marker2.setLatLng(position, {
-            draggable: 'true'
-        }).bindPopup(position).update();
-
-        distancia = getDistanceFromLatLonInKm(actual[0], actual[1], position.lat, position.lng)
-        document.getElementById("distanciaPuntos").innerHTML = "Distancia: " + distancia + " Km"
-        console.log("distancia: " + distancia)
-    });
-    let inputDistancia = document.getElementById("distancia")
-    let alarma = document.getElementById("audio")
-    inputDistancia.addEventListener("change", function (e) {
-        console.log(alarma.paused)
-        if (alarma.paused) {
-            alarma.play()
+        });
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                latit = position.coords.latitude;
+                longit = position.coords.longitude;
+                radius = position.coords.accuracy
+                actual = [latit, longit];
+                // this is just a marker placed in that position
+                actualMarker = L.marker(actual).addTo(map).bindPopup(parseFloat(radius).toFixed(2) + "metros de precision").openPopup();;
+                L.circle(actual, radius).addTo(map);
+                // move the map to have the location in its center
+                map.panTo(new L.LatLng(latit, longit));
+                actualizar_pos(actual)
+            })
         } else {
-            alarma.pause()
+            alert("No es soportado la localizacion")
+            actualizar_pos([-26.85992, -58.30883])
+
         }
-    })
+        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        map.attributionControl.setPrefix(false);
 
-    function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
-        var R = 6371; // Radius of the earth in km
-        var dLat = deg2rad(lat2 - lat1);  // deg2rad below
-        var dLon = deg2rad(lon2 - lon1);
-        var a =
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2)
-            ;
-        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        var d = R * c; // Distance in km
-        return d;
-    }
+        function actualizar_pos(coordenadas) {
+            marker2.setLatLng(coordenadas);
+            map.addLayer(marker2);
+            var position = marker2.getLatLng();
+            marker2.setLatLng(position, {
+                draggable: 'true'
+            }).bindPopup(position).update();
+        }
+        marker2.on('dragend', function (event) {
+            var position = marker2.getLatLng();
+            marker2.setLatLng(position, {
+                draggable: 'true'
+            }).bindPopup(position).update();
 
-    function deg2rad(deg) {
-        return deg * (Math.PI / 180)
-    }
-    var watchID = navigator.geolocation.watchPosition(function (position) {
-        //do_something(position.coords.latitude, position.coords.longitude);
-        actualMarker.setLatLng([position.coords.latitude, position.coords.longitude]).update();
-        console.log("whatching for the position:" + [position.coords.latitude, position.coords.longitude])
-        document.getElementById("Latitude").innerHTML ="Actual: "+position.coords.latitude
-        document.getElementById("Longitude").innerHTML ="Actual: " +position.coords.longitude
-    });
+            distancia = getDistanceFromLatLonInKm(actual[0], actual[1], position.lat, position.lng)
+            document.getElementById("distanciaPuntos").innerHTML = "Distancia: " + distancia + " Km"
+            console.log("distancia: " + distancia)
+        });
+        let inputDistancia = document.getElementById("distancia")
+        let alarma = document.getElementById("audio")
+        inputDistancia.addEventListener("change", function (e) {
+            console.log(alarma.paused)
+            if (alarma.paused) {
+                alarma.play()
+            } else {
+                alarma.pause()
+            }
+        })
 
-</script>
+        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+            var R = 6371; // Radius of the earth in km
+            var dLat = deg2rad(lat2 - lat1);  // deg2rad below
+            var dLon = deg2rad(lon2 - lon1);
+            var a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2)
+                ;
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            var d = R * c; // Distance in km
+            return d;
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI / 180)
+        }
+        var watchID = navigator.geolocation.watchPosition(function (position) {
+            //do_something(position.coords.latitude, position.coords.longitude);
+            actualMarker.setLatLng([position.coords.latitude, position.coords.longitude]).update();
+            console.log("whatching for the position:" + [position.coords.latitude, position.coords.longitude])
+        });
+
+    </script>
 
 </html>
