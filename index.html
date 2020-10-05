@@ -28,6 +28,7 @@
         <source src="/audios/alarma.mp3" type="audio/ogg">
       Your browser does not support the audio element.
       </audio> 
+      <h2 id="distanciaPuntos">Distancia: 0 Km</h2>
     <h3 id="Latitude"></h3>
     <h3 id="Longitude"></h3>
     <div id="mapid"></div>
@@ -35,6 +36,7 @@
 <script>
 
     curLocation = [-26.67, -55.67]
+    let distancia;
     var map = L.map('mapid').setView(curLocation, 13);
     var marker2 = new L.marker(curLocation, {
         draggable: 'true'
@@ -76,6 +78,9 @@
         }).bindPopup(position).update();
         document.getElementById("Latitude").innerHTML = position.lat
         document.getElementById("Longitude").innerHTML = position.lng
+        distancia =getDistanceFromLatLonInKm(actual[0],actual[1],position.lat,position.lng)
+        document.getElementById("distanciaPuntos").innerHTML="Distancia: "+distancia+" Km"
+        console.log("distancia: "+ distancia)
     });
 
 
@@ -89,8 +94,27 @@ inputDistancia.addEventListener("change",function(e){
     }else{
         alarma.pause()
     }
-
 })
+
+function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+     var R = 6371; // Radius of the earth in km
+     var dLat = deg2rad(lat2-lat1);  // deg2rad below
+     var dLon = deg2rad(lon2-lon1); 
+     var a = 
+       Math.sin(dLat/2) * Math.sin(dLat/2) +
+       Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+       Math.sin(dLon/2) * Math.sin(dLon/2)
+       ; 
+     var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+     var d = R * c; // Distance in km
+     return d;
+}
+
+function deg2rad(deg) {
+     return deg * (Math.PI/180)
+}
+
+
 </script>
 
 </html>
