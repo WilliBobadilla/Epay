@@ -38,7 +38,8 @@
     curLocation = [-26.67, -55.67]
     let distancia;
     var actualMarker;
-    var map = L.map('mapid').setView(curLocation, 13);
+    var map = L.map('mapid').fitWorld();
+    map.locate({setView:true, maxZoom:15})
     var marker2 = new L.marker(curLocation, {
         draggable: 'true'
     });
@@ -49,7 +50,7 @@
             radius= position.coords.accuracy
             actual = [latit, longit];
             // this is just a marker placed in that position
-            actualMarker = L.marker(actual).addTo(map).bindPopup("Estas a " + radius + " metros del punto").openPopup();;
+            actualMarker = L.marker(actual).addTo(map).bindPopup( radius +"metros de precision" ).openPopup();;
             L.circle(actual, radius).addTo(map);
             // move the map to have the location in its center
             map.panTo(new L.LatLng(latit, longit));
