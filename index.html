@@ -46,9 +46,11 @@
         navigator.geolocation.getCurrentPosition(function (position) {
             latit = position.coords.latitude;
             longit = position.coords.longitude;
+            radius= position.coords.accuracy
             actual = [latit, longit];
             // this is just a marker placed in that position
-            actualMarker = L.marker(actual).addTo(map);
+            actualMarker = L.marker(actual).addTo(map).bindPopup("Estas a " + radius + " metros del punto").openPopup();;
+            L.circle(actual, radius).addTo(map);
             // move the map to have the location in its center
             map.panTo(new L.LatLng(latit, longit));
             actualizar_pos(actual)
@@ -62,6 +64,7 @@
         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
     map.attributionControl.setPrefix(false);
+
     function actualizar_pos(coordenadas) {
         marker2.setLatLng(coordenadas);
         map.addLayer(marker2);
@@ -69,23 +72,17 @@
         marker2.setLatLng(position, {
             draggable: 'true'
         }).bindPopup(position).update();
-        // document.getElementById("Latitude").innerHTML = position.lat
-        // document.getElementById("Longitude").innerHTML = position.lng
     }
     marker2.on('dragend', function (event) {
         var position = marker2.getLatLng();
         marker2.setLatLng(position, {
             draggable: 'true'
         }).bindPopup(position).update();
-        // document.getElementById("Latitude").innerHTML = position.lat
-        // document.getElementById("Longitude").innerHTML = position.lng
+
         distancia = getDistanceFromLatLonInKm(actual[0], actual[1], position.lat, position.lng)
         document.getElementById("distanciaPuntos").innerHTML = "Distancia: " + distancia + " Km"
         console.log("distancia: " + distancia)
     });
-
-
-    /**/
     let inputDistancia = document.getElementById("distancia")
     let alarma = document.getElementById("audio")
     inputDistancia.addEventListener("change", function (e) {
@@ -118,7 +115,6 @@
         //do_something(position.coords.latitude, position.coords.longitude);
         actualMarker.setLatLng([position.coords.latitude, position.coords.longitude]).update();
         console.log("whatching for the position:" + [position.coords.latitude, position.coords.longitude])
-
         document.getElementById("Latitude").innerHTML ="Actual: "+position.coords.latitude
         document.getElementById("Longitude").innerHTML ="Actual: " +position.coords.longitude
     });
