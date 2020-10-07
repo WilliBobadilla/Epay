@@ -1,0 +1,17 @@
+<html>
+  <head>
+    <script src="https://osmnames.org/api/v1/autocomplete.js"></script>
+    <link href="https://osmnames.org/api/v1/autocomplete.css" rel="stylesheet" />
+  </head>
+  <body>
+    <input autocomplete="off" id="search" type="text" />
+    <script>
+      var autocomplete = new kt.OsmNamesAutocomplete(
+          'search', 'https://api.yourdomain.com/');
+
+      autocomplete.registerCallback(function(item) {
+        alert(JSON.stringify(item, ' ', 2));
+      });
+    </script>
+  </body>
+</html>
