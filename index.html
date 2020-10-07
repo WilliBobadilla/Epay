@@ -76,7 +76,9 @@
 
         curLocation = [-26.67, -55.67]
         let distancia;
+        let distanciaDeAviso;
         var actualMarker;
+        var apagadoAlarma;
         var map = L.map('mapid').fitWorld();
         map.locate({ setView: true, maxZoom: 15 })
         var marker2 = new L.marker(curLocation, {
@@ -126,12 +128,7 @@
         let inputDistancia = document.getElementById("distancia")
         let alarma = document.getElementById("audio")
         inputDistancia.addEventListener("change", function (e) {
-            console.log(alarma.paused)
-            if (alarma.paused) {
-                alarma.play()
-            } else {
-                alarma.pause()
-            }
+            distanciaDeAviso= inputDistancia.value
         })
 
         function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
@@ -155,6 +152,15 @@
             //do_something(position.coords.latitude, position.coords.longitude);
             actualMarker.setLatLng([position.coords.latitude, position.coords.longitude]).update();
             console.log("whatching for the position:" + [position.coords.latitude, position.coords.longitude])
+            if(distancia<distanciaDeAviso/1000) // dividimos entre mil ya que esta en km 
+            {
+                alarma.play()
+                let respuesta=confirm("Apagar alarma?")
+                if(respuesta){
+                    alarma.pause()
+                    alarma.currentTime=0
+                }
+            }
         });
 
     </script>
