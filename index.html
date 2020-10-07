@@ -24,13 +24,21 @@
     <!-- Core theme CSS (includes Bootstrap)-->
     <link href="css/styles.css" rel="stylesheet" />
     <style>
-      
         #mapid {
             height: 90%;
             width: 100%;
             margin: 0px;
             padding: 0px;
             position: absolute;
+        }
+
+        #div-configs {
+            height: 80%;
+        }
+
+        .masthead {
+            padding-top: calc(6rem + 30px);
+            padding-bottom: 1rem;
         }
     </style>
 </head>
@@ -52,16 +60,17 @@
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item mx-0 mx-lg-1"><a
-                                class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger"
-                                href="#portfolio">Acerca de</a></li>
+                                class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#portfolio">Acerca
+                                de</a></li>
                     </ul>
                 </div>
             </div>
         </nav>
         <header class="masthead bg-primary text-white text-center">
-            <div class="container d-flex align-items-center flex-column">
+            <div id="div-configs" class="container d-flex align-items-center flex-column">
                 <label>Ingresar a cuantos metros tiene que sonar el aviso:</label><br>
                 <input type="number" id="distancia" value="500" />
+                <input type="button" value="Actualizar" id="buttonUpdate">
                 <audio id="audio">
                     <source src="/audios/alarma.mp3" type="audio/ogg">
                     Your browser does not support the audio element.
@@ -75,15 +84,17 @@
     <script>
 
         curLocation = [-26.67, -55.67]
-        let distancia;
-        let distanciaDeAviso;
-        var actualMarker;
-        var apagadoAlarma;
+        let distancia
+        let distanciaDeAviso
+        let confirmacion=true
+        var actualMarker
+        let respuesta
+        var estadoAlarma = "Inactiva"; // indica el estado de la alarma, si esta ativa o no
         var map = L.map('mapid').fitWorld();
         map.locate({ setView: true, maxZoom: 15 })
         var marker2 = new L.marker(curLocation, {
             draggable: 'true'
-        });
+        })
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function (position) {
                 latit = position.coords.latitude;
@@ -95,7 +106,7 @@
                 L.circle(actual, radius).addTo(map);
                 // move the map to have the location in its center
                 map.panTo(new L.LatLng(latit, longit));
-                actualizar_pos(actual)
+                actualizar_pos([latit + 0.005, longit]) // esto es para diferenciar el otro marker
             })
         } else {
             alert("No es soportado la localizacion")
@@ -114,6 +125,8 @@
             marker2.setLatLng(position, {
                 draggable: 'true'
             }).bindPopup(position).update();
+            distancia = getDistanceFromLatLonInKm(actual[0], actual[1], position.lat, position.lng)
+            document.getElementById("distanciaPuntos").innerHTML = "Distancia: " + distancia.toFixed(2) + " Km" + " Alarma: " + estadoAlarma
         }
         marker2.on('dragend', function (event) {
             var position = marker2.getLatLng();
@@ -122,14 +135,19 @@
             }).bindPopup(position).update();
 
             distancia = getDistanceFromLatLonInKm(actual[0], actual[1], position.lat, position.lng)
-            document.getElementById("distanciaPuntos").innerHTML = "Distancia: " + distancia + " Km"
+            document.getElementById("distanciaPuntos").innerHTML = "Distancia: " + distancia.toFixed(2) + " Km" + " Alarma: " + estadoAlarma
             console.log("distancia: " + distancia)
         });
         let inputDistancia = document.getElementById("distancia")
         let alarma = document.getElementById("audio")
-        inputDistancia.addEventListener("change", function (e) {
-            distanciaDeAviso= inputDistancia.value
-        })
+        let button = document.getElementById("buttonUpdate")
+        function updateText() {
+            distanciaDeAviso = inputDistancia.value
+            estadoAlarma = "Activa"
+            document.getElementById("distanciaPuntos").innerHTML = "Distancia: " + distancia.toFixed(2) + " Km" + " Alarma: " + estadoAlarma
+        }
+        button.addEventListener("click", updateText)
+        inputDistancia.addEventListener("change", updateText)
 
         function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
             var R = 6371; // Radius of the earth in km
@@ -152,13 +170,27 @@
             //do_something(position.coords.latitude, position.coords.longitude);
             actualMarker.setLatLng([position.coords.latitude, position.coords.longitude]).update();
             console.log("whatching for the position:" + [position.coords.latitude, position.coords.longitude])
-            if(distancia<distanciaDeAviso/1000) // dividimos entre mil ya que esta en km 
+            console.log(estadoAlarma + "alarma")
+            if (distancia < distanciaDeAviso / 1000 && estadoAlarma == "Activa") // dividimos entre mil ya que esta en km 
             {
                 alarma.play()
-                let respuesta=confirm("Apagar alarma?")
-                if(respuesta){
+                console.log("confirmacion datos: "+ confirmacion)
+                if (confirmacion) {
+                    confirmacion = false
+                    respuesta = confirm("Apagar alarma? Para activar de nuevo presiona el boton Actualizar")
+                   
+                }
+                if (respuesta) {
                     alarma.pause()
-                    alarma.currentTime=0
+                    alarma.currentTime = 0
+                    estadoAlarma = "Inactiva"; //desactivamos por ahora
+                    confirmacion = true  // para que salte de nevo la proxima
+                    console.log("pausando")
+                    respuesta=false
+                    document.getElementById("distanciaPuntos").innerHTML = "Distancia: " + distancia.toFixed(2) + " Km" + " Alarma: " + estadoAlarma
+                    //updateText();
+                }else{  //  en el caso que se presione cancelar
+                    confirmacion = true
                 }
             }
         });
